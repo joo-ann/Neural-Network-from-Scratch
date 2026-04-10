@@ -17,13 +17,12 @@ class Network():
         visual = []
         for i in range(len(self.network)):
             l = []
-            print(len(self.network[i]))
             for _ in range(len(self.network[i])):
-                print('happened')
                 l.append('o')
             visual.append(l)
             
         print(*visual, sep='\n')
+
 
     def forward(self, inp):
         for i in self.network:
@@ -38,4 +37,6 @@ class Network():
 
 
 test = Network(1, 2, 2)
+test.layers()
+print('\n')
 print(test.forward(1))
