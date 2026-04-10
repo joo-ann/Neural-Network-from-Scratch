@@ -13,6 +13,10 @@ class Network():
             for j in range(len(self.network[i])):
                 self.network[i][j].add_next(_ for _ in self.network[i-1])
 
+    def dataset(self, labels, *features):
+        self.labels = labels
+        self.features = features
+
     def layers(self): 
         visual = []
         for i in range(len(self.network)):
@@ -34,9 +38,16 @@ class Network():
 
         return sum(calc)
 
+    def backward(self):
+        error = []
+        for i in range(len(self.labels)):
+            prediction = self.network.forward(self.features[i])
+            error.append((prediction-self.labels[i])**2)
+
+        
+        
 
 
 test = Network(1, 2, 2)
 test.layers()
-print('\n')
 print(test.forward(1))
