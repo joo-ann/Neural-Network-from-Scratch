@@ -72,9 +72,8 @@ class Network():
         for i in range(len(self.layers)):
             v = np.matmul(self.layers[i], v) + self.biases[i]
             v = self.sigmoid(v)
-            print('v:', v)
 
-        print('Output:', v)
+        return v
 
     def get_weights(self):
         return self.layers
@@ -91,9 +90,11 @@ class Network():
             visual.append(l)
             
         print(*visual, sep='\n')
+
+    def backprop(self, inp, label):
+        loss = 0.5 * (self.forward(inp) - label)**2
+    
             
 test = Network(2, 2, 1)
-
-print("Weights:", test.get_weights())
 
 test.forward(np.array([[1], [1]]))

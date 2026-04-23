@@ -1,12 +1,15 @@
 import numpy as np
 from node import Node
-
+import random
 
 class Network():
     def __init__(self, *layers):
         self.network = []
-        for i in layers:
-            l = [Node(1, 1, [], []) for _ in range(i)]
+        for i in range(len(layers)):
+            w = [random.randint(-100, 100) for _ in range(i)]
+            w = np.array(w)
+            b = random.randint(-10, 10)
+            l = [Node(w, b, []) for _ in range(i)]
             self.network.append(l)
         
         for i in range(1, len(self.network)):
@@ -45,9 +48,15 @@ class Network():
             error.append((prediction-self.labels[i])**2)
 
         
-        
-
+    def bprop(self, prediction, label):
+        error = 0.5*(prediction-label)**2
+        der = prediction - label
+        sigm = prediction(1-prediction)
+            
 
 test = Network(1, 2, 2)
 test.layers()
 print(test.forward(1))
+
+
+
