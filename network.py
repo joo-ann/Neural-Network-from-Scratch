@@ -48,15 +48,12 @@ class Network():
             error.append((prediction-self.labels[i])**2)
 
         
-    def bprop(self, prediction, label):
-        error = 0.5*(prediction-label)**2
-        der = prediction - label
-        sigm = prediction(1-prediction)
-            
+    def backprop(self, prediction, label):
+        error = 0.5 * (label - prediction)**2
 
-test = Network(1, 2, 2)
+        
+
+
+test = Network(4, 2, 2)
 test.layers()
-print(test.forward(1))
-
-
-
+print(test.forward([1, 2, 2, 2]))

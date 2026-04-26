@@ -48,7 +48,7 @@ class Network():
         for i in range(1, len(layers)):
             l = []
             for j in range(layers[i]): 
-                w = [random.randint(-10, 10) for _ in range(layers[i-1])]
+                w = [(random.randint(0, 100)/100) for _ in range(layers[i-1])]
                 b = random.randint(-10, 10)
                 b = np.array(b)
                 p = self.network[i-1]
@@ -68,9 +68,11 @@ class Network():
         return 1 / (1 + np.exp(-x))
     
     def forward(self, inp):
+        self.activation = []
         v = inp
         for i in range(len(self.layers)):
             v = np.matmul(self.layers[i], v) + self.biases[i]
+            self.activation.append(v)
             v = self.sigmoid(v)
 
         return v
@@ -91,10 +93,21 @@ class Network():
             
         print(*visual, sep='\n')
 
+    def get_activation(self):
+        return self.activation
+
     def backprop(self, inp, label):
         loss = 0.5 * (self.forward(inp) - label)**2
-    
+        gradients = []
+        for i in range(len(self.layers)-1):
+            gradients.append()
+
             
 test = Network(2, 2, 1)
 
-test.forward(np.array([[1], [1]]))
+inp = np.array([1, 1])
+print(test.forward(inp))
+
+print(test.get_weights())
+
+print(test.get_activation())
