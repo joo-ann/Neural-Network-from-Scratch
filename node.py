@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import math
+from torchvision import datasets
 
 class Node():
     def __init__(self, w=[], b=[], p=[], v=-1):
@@ -64,24 +65,39 @@ class Network():
             self.biases.append(np.array(y).reshape(-1, 1))
             self.network.append(l)
     
+
     def sigmoid(self, x):
         return 1 / (1 + np.exp(-x))
     
+
+    def sigmoid_deriv(self, x):
+        s = self.sigmoid(x)
+        return s * (1 - s)
+    
+
     def forward(self, inp):
-        self.activation = []
+        self.activation = [inp]
+        self.z_vals = []
+
         v = inp
+
         for i in range(len(self.layers)):
-            v = np.matmul(self.layers[i], v) + self.biases[i]
+            z = np.matmul(self.layers[i], v) + self.biases[i].flatten()
+            self.z_vals.append(z)
+
+            v = self.sigmoid(z)
             self.activation.append(v)
-            v = self.sigmoid(v)
 
         return v
+
 
     def get_weights(self):
         return self.layers
 
+
     def set_weights(self, l):
         self.layers = l
+
 
     def display(self): 
         visual = []
@@ -93,21 +109,64 @@ class Network():
             
         print(*visual, sep='\n')
 
-    def get_activation(self):
-        return self.activation
 
-    def backprop(self, inp, label):
-        loss = 0.5 * (self.forward(inp) - label)**2
-        gradients = []
-        for i in range(len(self.layers)-1):
-            gradients.append()
 
-            
-test = Network(2, 2, 1)
+    def backprop(self, inp, label, lr=0.1):
+        output = self.forward(inp)
 
-inp = np.array([1, 1])
-print(test.forward(inp))
+        label = np.array(label)
 
-print(test.get_weights())
+        delta = (output - label) * self.sigmoid_deriv(self.z_vals[-1])
 
-print(test.get_activation())
+        nabla_w = [None] * len(self.layers)
+        nabla_b = [None] * len(self.biases)
+
+        nabla_w[-1] = np.outer(delta, self.activation[-2])
+        nabla_b[-1] = delta
+
+        for l in range(2, len(self.layers) + 1):
+            z = self.z_vals[-l]
+            sp = self.sigmoid_deriv(z)
+
+            delta = np.dot(self.layers[-l + 1].T, delta) * sp
+
+            nabla_w[-l] = np.outer(delta, self.activation[-l - 1])
+            nabla_b[-l] = delta
+
+        for i in range(len(self.layers)):
+            self.layers[i] -= lr * nabla_w[i]
+            self.biases[i] -= lr * nabla_b[i].reshape(-1, 1)
+
+        return 0.5*(output-label)**2
+
+    def train(self, inp, label, epochs, validation_split=0.1):
+        split = int(len(inp) * (1 - validation_split))
+
+        train_x = inp[:split]
+        train_y = label[:split]
+
+        valid_x = inp[split:]
+        valid_y = label[split:]
+
+        for ep in range(epochs):
+            total_loss = 0
+
+            idx = np.arange(len(train_x))
+            np.random.shuffle(idx)
+
+            for i in idx:
+                loss = self.backprop(train_x[i], train_y[i])
+                total_loss += loss
+
+            val_loss = 0
+            for i in range(len(valid_x)):
+                output = self.forward(valid_x[i])
+                val_loss += 0.5 * (output - valid_y[i])**2
+
+            print(f"Epoch {ep}: train_loss={total_loss}, val_loss={val_loss}")
+
+    
+train_data = datasets.MNIST(root='data', train=True, download=True)
+test_data = datasets.MNIST(root='./data', train=False, download=True)
+
+print(train_data)
