@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import math
-from torchvision import datasets
+from torchvision import datasets, transforms
 
 class Node():
     def __init__(self, w=[], b=[], p=[], v=-1):
@@ -124,14 +124,14 @@ class Network():
         nabla_w[-1] = np.outer(delta, self.activation[-2])
         nabla_b[-1] = delta
 
-        for l in range(2, len(self.layers) + 1):
-            z = self.z_vals[-l]
+        for i in range(2, len(self.layers) + 1):
+            z = self.z_vals[-i]
             sp = self.sigmoid_deriv(z)
 
-            delta = np.dot(self.layers[-l + 1].T, delta) * sp
+            delta = np.dot(self.layers[-i + 1].T, delta) * sp
 
-            nabla_w[-l] = np.outer(delta, self.activation[-l - 1])
-            nabla_b[-l] = delta
+            nabla_w[-i] = np.outer(delta, self.activation[-i - 1])
+            nabla_b[-i] = delta
 
         for i in range(len(self.layers)):
             self.layers[i] -= lr * nabla_w[i]
@@ -148,7 +148,7 @@ class Network():
         valid_x = inp[split:]
         valid_y = label[split:]
 
-        for ep in range(epochs):
+        for n in range(epochs):
             total_loss = 0
 
             idx = np.arange(len(train_x))
@@ -163,10 +163,18 @@ class Network():
                 output = self.forward(valid_x[i])
                 val_loss += 0.5 * (output - valid_y[i])**2
 
-            print(f"Epoch {ep}: train_loss={total_loss}, val_loss={val_loss}")
+            print(f"Epoch {n}: train_loss={total_loss}, val_loss={val_loss}")
 
     
-train_data = datasets.MNIST(root='data', train=True, download=True)
-test_data = datasets.MNIST(root='./data', train=False, download=True)
+train_data = datasets.MNIST(root='data', train=True, download=True, transform=transforms.ToTensor())
 
-print(train_data)
+features = []
+labels = []
+
+for x, y in train_data:
+    features.append(x.view(-1).tolist())
+    labels.append(y)
+
+network = Network(784, 16, 16, 10)
+
+network.train(features, labels)
