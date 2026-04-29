@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from node import Node
-import json
+
 
 class Network():
     def __init__(self, *layers):
@@ -111,7 +111,7 @@ class Network():
         valid_x = inp[split:]
         valid_y = label[split:]
 
-        for ep in range(epochs):
+        for n in range(epochs):
             total_loss = 0
 
             idx = np.arange(len(train_x))
@@ -126,7 +126,7 @@ class Network():
                 output = self.forward(valid_x[i])
                 val_loss += 0.5 * (output - valid_y[i])**2
 
-            print(f"Epoch {ep}: train_loss={total_loss}, val_loss={val_loss}")
+            print(f"Epoch {n}: train_loss={total_loss}, val_loss={val_loss}")
 
         self.save()
 
@@ -142,4 +142,3 @@ class Network():
 
         self.layers = list(data['weights'])
         self.biases = list(data['biases'])
-
