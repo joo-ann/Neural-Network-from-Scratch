@@ -130,7 +130,16 @@ class Network():
 
         self.save()
 
-
     def save(self):
-        np.savez("network.npz", weights=self.layers, biases=self.biases)
-        
+        np.savez(
+            "network.npz",
+            weights=np.array(self.layers, dtype=object),
+            biases=np.array(self.biases, dtype=object)
+        )
+
+    def load(self):
+        data = np.load("network.npz", allow_pickle=True)
+
+        self.layers = list(data['weights'])
+        self.biases = list(data['biases'])
+
