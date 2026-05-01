@@ -12,9 +12,8 @@ class Network():
         for i in range(1, len(layers)):
             l = []
             for j in range(layers[i]): 
-                w = [(random.randint(0, 100)/100) for _ in range(layers[i-1])]
-                b = random.randint(-10, 10)
-                b = np.array(b)
+                w = np.random.randn(layers[i-1]) * 0.1
+                b = np.array(random.uniform(-1, 1), dtype=float)
                 p = self.network[i-1]
                 l.append(Node(w, b, p))
             x = []
@@ -79,26 +78,26 @@ class Network():
 
         label = np.array(label)
 
-        delta = (output - label) * self.sigmoid_deriv(self.z_vals[-1])
+        error = (output - label) * self.sigmoid_deriv(self.z_vals[-1])
 
-        nabla_w = [None] * len(self.layers)
-        nabla_b = [None] * len(self.biases)
+        grad_w = [None] * len(self.layers)
+        grad_b = [None] * len(self.biases)
 
-        nabla_w[-1] = np.outer(delta, self.activation[-2])
-        nabla_b[-1] = delta
+        grad_w[-1] = np.outer(error, self.activation[-2])
+        grad_b[-1] = error
 
         for l in range(2, len(self.layers) + 1):
             z = self.z_vals[-l]
             sp = self.sigmoid_deriv(z)
 
-            delta = np.dot(self.layers[-l + 1].T, delta) * sp
+            error = np.dot(self.layers[-l + 1].T, error) * sp
 
-            nabla_w[-l] = np.outer(delta, self.activation[-l - 1])
-            nabla_b[-l] = delta
+            grad_w[-l] = np.outer(error, self.activation[-l - 1])
+            grad_b[-l] = error
 
         for i in range(len(self.layers)):
-            self.layers[i] -= lr * nabla_w[i]
-            self.biases[i] -= lr * nabla_b[i].reshape(-1, 1)
+            self.layers[i] -= lr * grad_w[i]
+            self.biases[i] -= lr * grad_b[i].reshape(-1, 1)
 
         return 0.5*(output-label)**2
 
@@ -126,7 +125,7 @@ class Network():
                 output = self.forward(valid_x[i])
                 val_loss += 0.5 * (output - valid_y[i])**2
 
-            print(f"Epoch {n}: train_loss={total_loss}, val_loss={val_loss}")
+            print(f"Epoch {n+1}: train_loss={total_loss}, val_loss={val_loss}")
 
         self.save()
 

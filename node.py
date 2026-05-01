@@ -1,7 +1,5 @@
 import numpy as np
-import random
 import math
-from torchvision import datasets, transforms
 
 class Node():
     def __init__(self, w=[], b=[], p=[], v=-1):
