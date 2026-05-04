@@ -125,7 +125,9 @@ class Network():
                 output = self.forward(valid_x[i])
                 val_loss += 0.5 * (output - valid_y[i])**2
 
-            print(f"Epoch {n+1}: train_loss={total_loss}, val_loss={val_loss}")
+            t_loss = sum(total_loss)/len(total_loss)
+            v_loss = sum(val_loss)/len(val_loss)
+            print(f"Epoch {n+1}: train_loss={t_loss}, val_loss={v_loss}")
 
         self.save()
 
