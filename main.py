@@ -1,22 +1,38 @@
-import matplotlib.pyplot as plt
+import numpy as np
+from network import Network
+from torchvision import datasets, transforms
 
-primes = [2]
+if __name__ == "__main__":
+    network = Network(784, 16, 16, 10)
+    transform = transforms.ToTensor()
 
-for i in range(3, 1000):
-    prime = True
-    for j in range(2, i):
-        if i % j == 0:
-            prime = False
-    if prime:
-        primes.append(i)
+    train_dataset = datasets.MNIST(
+        root='./data',
+        train=True,
+        download=True,
+        transform=transform
+    )
 
-distances = []
+    test_dataset = datasets.MNIST(
+        root='./data',
+        train=False,
+        download=True,
+        transform=transform
+    )
 
-for i in range(len(primes)-2):
-    distances.append(primes[i+1]-primes[i])
+    inputs = []
+    labels = []
 
-plt.hist(distances)
-plt.xlabel('Distance')
-plt.ylabel('Frequency')
-plt.title('Distances between Primes')
-plt.show()
+    for i, j in train_dataset:
+        x = i.view(784).numpy()
+        y = np.zeros(10)
+        y[j] = 1
+        
+        inputs.append(x)
+        labels.append(y)
+
+
+    inputs = np.array(inputs)
+    labels = np.array(labels)
+
+    network.train(inputs[:5000], labels[:5000], epochs=100)
