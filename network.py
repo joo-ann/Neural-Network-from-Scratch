@@ -130,7 +130,7 @@ class Network():
             print(f"Epoch {n+1}: train_loss={t_loss}, val_loss={v_loss}")
 
         self.save()
-
+ 
     def save(self):
         np.savez(
             "network.npz",
@@ -143,3 +143,6 @@ class Network():
 
         self.layers = list(data['weights'])
         self.biases = list(data['biases'])
+
+    def predict(self, inp):
+        return self.forward(inp)
